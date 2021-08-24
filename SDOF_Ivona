@@ -1,0 +1,71 @@
+
+@author: Ivona
+"""
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+dof = 1 
+
+M = 0.7933
+K = 134.749
+C = 1
+
+ 
+t_start = 0
+t_end = 10
+N = 10000
+dt = t_end/N
+
+x0 = 0.1
+v0 = -1
+
+def newmark(M, K, C, dt, N, x0, v0):
+    x = np.zeros(N,float)
+    dx = np.zeros(N, float)
+    ddx = np.zeros(N,float)
+    Feff = np.zeros(N, float)
+    
+    x[0] = x0
+    dx[0] = v0
+    ddx[0] = (-C*dx[0]-K*x[0])/M
+ 
+    beta = 0.25
+    gama = 0.5
+    
+
+    a0 = 1/(beta*dt**2)
+    a1 = gama/(beta*dt)
+    a2 = 1/(beta*dt)
+    a3 = (1/(2*beta))-1
+    a4 = 1-(gama/beta)
+    a5 = (1-gama/(2*beta))*dt
+    a6 = dt*(1-gama)
+    a7 = gama*dt
+    
+    
+    Keff = (K+(a0*M)+(a1*C))
+    
+
+    
+    for t in range (0, N-1):
+        Feff = (M*((a0*x[t])+(a2*dx[t])+(a3*ddx[t])) - (C*((-a1*x[t])+(a4*dx[t])+(a5*ddx[t]))))
+        
+        x[t+1] = Feff/Keff     
+        ddx[t+1] = (a0*(x[t+1]-x[t]))-((a2*dx[t])+(a3*ddx[t]))
+        dx[t+1] = dx[t] + a6*ddx[t]+ a7*ddx[t+1]       
+         
+    return x, dx, ddx
+
+x, dx, ddx  = newmark(M, K, C, dt, N, x0, v0)  
+    
+
+ 
+ 
+
+plt.plot(x);
+plt.title()
+plt.xlabel("Time")
+plt.ylabel("Displacement")
+plt.show()
